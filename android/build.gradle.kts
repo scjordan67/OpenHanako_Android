@@ -62,6 +62,9 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.work.runtime.ktx)
+    // 自带 FTS5 的 SQLite。真机探针实测：系统 SQLite 3.44.5 没有 FTS5，
+    // 而 FactStore 的整套检索建立在它之上，所以必须 bundle 一份。
+    implementation(libs.androidx.sqlite.bundled)
     implementation(libs.kotlinx.coroutines.core)
 
     testImplementation(kotlin("test"))

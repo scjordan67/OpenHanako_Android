@@ -20,6 +20,7 @@ androidxCore = "1.15.0"
 activityCompose = "1.9.3"
 composeBom = "2024.12.01"
 workRuntime = "2.10.0"
+sqliteBundled = "2.5.2"
 androidxTestJunit = "1.2.1"
 
 [libraries]
@@ -44,6 +45,7 @@ androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntime" }
 androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestJunit" }
+androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqliteBundled" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

@@ -41,22 +41,40 @@ token 用 OR 连接 —— **只要共享一个二字片段就会命中**。实�
 **不能用 `android.database.sqlite`。** 系统自带的 SQLite 版本随 OS 版本走，
 FTS5 是编译期选项，可用性无法假设 —— 而 FactStore 的整个检索方案建立在它之上。
 
-**必须 bundle 一个自带 FTS5 的 SQLite**，候选：
+**必须 bundle 一个自带 FTS5 的 SQLite。** 这条不再是推测 —— 目标平板实测结果：
 
-| 方案 | 说明 |
+```
+系统 SQLite: 3.44.5
+  FTS5 可用: false
+```
+
+探针的判据是直接执行 `CREATE VIRTUAL TABLE … USING fts5(…)`，而不是翻
+`PRAGMA compile_options` —— 后者在某些 ROM 上会误报，前者就是最终要用的那个能力。
+语句直接抛异常，所以结论是确定的，不存在假阴性。
+
+选型经过：
+
+| 方案 | 结论 |
 |---|---|
-| `requery/sqlite-android` | 自带编译好的 SQLite，确定开了 FTS5，API 兼容 `android.database` |
-| SQLCipher for Android | 也自带 SQLite，附带加密（记忆是隐私数据，这点有额外价值） |
+| `requery/sqlite-android` | ✗ 不在 Maven Central 上（`com.github.requery` 是 JitPack 坐标），要额外加仓库，多一个出口依赖 |
+| SQLCipher for Android | ✗ 在 Maven Central 上且自带 FTS5，但它是加密库 —— 记忆加密确实有价值，可那是独立的产品决定，牵扯密钥存放在哪，不该顺手捎上 |
+| **`androidx.sqlite:sqlite-bundled`** | ✓ 官方维护，Google Maven 上有，随包带一份编好 FTS5 的 SQLite |
 
-选型建议：先用 `requery/sqlite-android` 打通；如果后面要给记忆库加密，
-再评估换 SQLCipher（两者 API 面接近，切换成本可控）。
+用的是 `androidx.sqlite:sqlite-bundled`。它走的是新的 `SQLiteDriver` / `SQLiteConnection`
+API（不是 `android.database.sqlite`），FactStore 还没落地，现在换成本最低。
+
+**「随包的那份有 FTS5」同样不靠假设。** 探针改成两个引擎各跑一遍完整链路
+（建 schema、插入、CJK 子串检索、删除后触发器是否同步索引），诊断页把两条结果
+并排显示。随包那条不达标会明确标成 ⚠ —— 那种情况下记忆搜索是**静默**失效的，
+不会有任何报错，必须让它在界面上喊出来。
 
 ## 待设备验证
 
 这个 spike 用的是 `sqlite-jdbc`（自带 SQLite，开了 FTS5），**不能代表 Android**。
 以下必须在真机上再确认一次：
 
-- [ ] bundle 的 SQLite 确实报告 `ENABLE_FTS5`（跑同一份 `PRAGMA compile_options` 断言）
+- [x] ~~系统 SQLite 是否够用~~ —— 实测 3.44.5 无 FTS5，必须 bundle（2026-08-24）
+- [ ] 随包 SQLite 的完整链路在设备上全绿（探针已就位，等下一版 APK 的结果）
 - [ ] `unicode61` 分词器在 Android 的 ICU 环境下行为一致（尤其日文假名、韩文）
 - [ ] WAL 模式在 Android 的存储路径下可用（内存库跳过了这项）
 - [ ] `mmap_size = 30MB` 在低端设备上的实际表现（可能要下调）
