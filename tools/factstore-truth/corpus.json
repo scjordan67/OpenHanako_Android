@@ -1,0 +1,33 @@
+{
+  "facts": [
+    { "fact": "用户喜欢暖纸主题", "tags": ["偏好", "界面"] },
+    { "fact": "平板是 Android 设备", "tags": ["设备"] },
+    { "fact": "记忆传送带每天凌晨四点滚动", "tags": ["记忆", "调度"] },
+    { "fact": "User prefers dark mode at night", "tags": ["preference"] },
+    { "fact": "better-sqlite3 需要 aarch64 重编", "tags": ["移植", "Android"] },
+    { "fact": "ひらがなとカタカナのテスト", "tags": ["日本語"] },
+    { "fact": "한글 테스트", "tags": [] },
+    { "fact": "混合 mixed 内容 content 测试", "tags": ["混合"] },
+    { "fact": "全角ＡＢＣ会被 NFKC 折成半角", "tags": [] },
+    { "fact": "带\"引号\"的事实", "tags": ["转义"] },
+    { "fact": "短", "tags": [] },
+    { "fact": "两字", "tags": [] }
+  ],
+  "queries": [
+    "暖纸",
+    "记忆传送带",
+    "Android",
+    "dark mode",
+    "凌晨四点",
+    "better-sqlite3",
+    "ひらがな",
+    "한글",
+    "混合 mixed",
+    "全角ＡＢＣ",
+    "带\"引号\"的",
+    "",
+    "   ",
+    "短",
+    "两字"
+  ]
+}
