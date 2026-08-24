@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
@@ -48,19 +50,33 @@ tasks.test {
 // 早失败：JVM 写不出带中文的文件名时，给一句能照做的话。
 //
 // 本项目的测试方法名是中文，方法里有 lambda 时 Kotlin 会生成
-// `XxxTest$中文方法名$1.class`。JVM 能否写出这种文件名由 sun.jnu.encoding 决定，
-// 而它由操作系统 locale 定死，-D 改不动。locale 是 POSIX/C 时它会退化成
-// ANSI_X3.4-1968，编译中途报的是 “Failed to create MD5 hash for file ... as it
-// does not exist” —— 文件明明写出来了，只是 Gradle 用 ASCII 解不出那个名字。
-// 这个错误跟真实原因八竿子打不着，所以在这里拦一道。
-val fileNameEncoding: String = System.getProperty("sun.jnu.encoding") ?: ""
-if (!fileNameEncoding.contains("UTF", ignoreCase = true)) {
+// `XxxTest${'$'}中文方法名${'$'}1.class`。写不出这种文件名时，编译中途报的是
+// "Failed to create MD5 hash for file ... as it does not exist" —— 文件明明写出来
+// 了，只是 Gradle 用 ASCII 解不出那个名字。这个错误跟真实原因八竿子打不着。
+//
+// 判据是**实际探一次**，而不是看 sun.jnu.encoding 的名字 —— 两者并不等价：
+// Windows 的 sun.jnu.encoding 通常是 Cp1252，但 JVM 走宽字符 API，中文文件名照写
+// 不误（CI 的 windows 任务一直是绿的）。按名字判断会把 Windows 误伤成失败，
+// 这个坑我踩过一次。
+val canWriteNonAsciiFileNames: Boolean = runCatching {
+    val dir = Files.createTempDirectory("hana-filename-probe")
+    try {
+        val name = "内省块${'$'}1.class"
+        Files.writeString(dir.resolve(name), "probe")
+        // 必须回读目录：编码不支持时写入可能"成功"，但名字已被替换成 ? 一类的字符
+        Files.list(dir).use { entries -> entries.anyMatch { it.fileName.toString() == name } }
+    } finally {
+        dir.toFile().deleteRecursively()
+    }
+}.getOrDefault(false)
+
+if (!canWriteNonAsciiFileNames) {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
         doFirst {
             throw GradleException(
                 """
-                当前 JVM 的文件名编码是 $fileNameEncoding，写不出带中文的 class 文件名，
-                而本项目的测试方法名是中文。
+                当前 JVM 写不出带中文的文件名（sun.jnu.encoding = ${System.getProperty("sun.jnu.encoding")}），
+                而本项目的测试方法名是中文，编译产物里会出现这样的文件名。
 
                 带上 UTF-8 locale 重新跑即可：
 
