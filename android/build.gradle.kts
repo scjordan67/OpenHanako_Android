@@ -66,6 +66,9 @@ dependencies {
     // 而 FactStore 的整套检索建立在它之上，所以必须 bundle 一份。
     implementation(libs.androidx.sqlite.bundled)
     implementation(libs.kotlinx.coroutines.core)
+    // ktor 的引擎：:core 只依赖 ktor-client-core（不绑定引擎），由用它的一端选。
+    // Android 上选 OkHttp —— 连接复用、HTTP/2、系统代理都由它处理好了。
+    implementation(libs.ktor.client.okhttp)
 
     testImplementation(kotlin("test"))
     androidTestImplementation(libs.androidx.test.junit)
