@@ -27,8 +27,20 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      # 不加 --stacktrace：Kotlin 编译错误只需要那几行 `e:`，而 --stacktrace 会打出
+      # 上百行 Gradle 内部调用栈，把真正的错误顶到日志中间，排查时得翻很久。
       - name: 跑 :core 测试
-        run: ./gradlew :core:test --stacktrace
+        run: |
+          set -o pipefail
+          ./gradlew :core:test 2>&1 | tee /tmp/core-build.log
+
+      - name: 编译错误摘要
+        if: failure()
+        run: |
+          echo "── Kotlin 编译错误 ──"
+          grep -E "^e: |^w: .*error" /tmp/core-build.log || echo "(没有 e: 行 —— 多半是测试失败而不是编译失败)"
+          echo "── 失败的测试 ──"
+          grep -E "FAILED$" /tmp/core-build.log | head -40 || true
 
       - name: 上传 Spike 报告
         if: always()
@@ -64,10 +76,20 @@ jobs:
           ls "$ANDROID_HOME/platforms" || true
 
       - name: 编译 :android
-        run: ./gradlew :android:assembleDebug -Pandroid.enabled=true --stacktrace
+        run: |
+          set -o pipefail
+          ./gradlew :android:assembleDebug -Pandroid.enabled=true 2>&1 | tee /tmp/android-build.log
+
+      - name: 编译错误摘要
+        if: failure()
+        run: |
+          echo "── Kotlin 编译错误 ──"
+          grep -E "^e: " /tmp/android-build.log || echo "(没有 e: 行，看上面的完整输出)"
 
       - name: 跑 :android 的单元测试
-        run: ./gradlew :android:testDebugUnitTest -Pandroid.enabled=true --stacktrace
+        run: |
+          set -o pipefail
+          ./gradlew :android:testDebugUnitTest -Pandroid.enabled=true 2>&1 | tee /tmp/android-test.log
 
       - name: 上传 APK
         if: success()
