@@ -1,0 +1,53 @@
+# Version catalog — 单一真相源。
+# :core 只允许出现能在纯 JVM 上跑的依赖；任何 Android-only 依赖属于 :android。
+
+[versions]
+kotlin = "2.1.20"
+coroutines = "1.10.1"
+serialization = "1.8.0"
+ktor = "3.1.1"
+# jieba-analysis 是纯 Java，JVM 与 Android 上是同一份实现 —— 所以分词行为
+# 在这里测出来的结果，在平板上成立。
+jieba = "1.0.2"
+# xerial sqlite-jdbc 自带编译好的 SQLite（含 FTS5），用于在 JVM 上验证
+# FactStore 的 schema 与检索契约。Android 侧另有自己的 SQLite（见 docs）。
+sqliteJdbc = "3.49.1.0"
+junit = "5.11.4"
+
+# ── Android 侧（本容器拿不到：出口策略挡了 dl.google.com；由 CI 验证）──
+agp = "8.7.3"
+androidxCore = "1.15.0"
+activityCompose = "1.9.3"
+composeBom = "2024.12.01"
+workRuntime = "2.10.0"
+androidxTestJunit = "1.2.1"
+
+[libraries]
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+jieba = { module = "com.huaban:jieba-analysis", version.ref = "jieba" }
+sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqliteJdbc" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntime" }
+androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestJunit" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
