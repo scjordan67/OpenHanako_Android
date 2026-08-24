@@ -184,3 +184,47 @@ class CssColorTest {
         assertEquals(0x80FFFFFF.toInt(), CssColor.parse("rgba(255, 255, 255, 50.2%)"))
     }
 }
+
+/** CSS 长度解析。间距/圆角/字号都走这里。 */
+class CssLengthTest {
+
+    @Test
+    fun `rem 按 16px 换算`() {
+        assertEquals(8f, CssLength.parse("0.5rem"))
+        assertEquals(16f, CssLength.parse("1rem"))
+        assertEquals(24f, CssLength.parse("1.5rem"))
+    }
+
+    @Test
+    fun `px 原样`() {
+        assertEquals(3f, CssLength.parse("3px"))
+        assertEquals(720f, CssLength.parse("720px"))
+    }
+
+    @Test
+    fun `calc 与 max 不展开 —— 别在这层做半个 CSS 引擎`() {
+        assertNull(CssLength.parse("max(2px, calc(var(--radius-chat-card) - 2px))"))
+        assertNull(CssLength.parse("calc(var(--chat-column-width) + 1rem)"))
+    }
+
+    @Test
+    fun `不是长度的值返回 null`() {
+        assertNull(CssLength.parse("none"))
+        assertNull(CssLength.parse("#F8F4ED"))
+        assertNull(CssLength.parse(""))
+        assertEquals(0f, CssLength.parse("0"))
+    }
+
+    @Test
+    fun `设计系统里的间距圆角字号全都解析得出来`() {
+        val baseline = ThemeAssets.baseline
+        val scales = baseline.filterKeys {
+            it.startsWith("--space-") || it.startsWith("--fs-") ||
+                (it.startsWith("--radius-") && "(" !in baseline.getValue(it))
+        }
+        assertTrue(scales.size >= 20, "只找到 ${scales.size} 个尺度 token，导出可能不完整")
+        for ((key, value) in scales) {
+            assertNotNull(CssLength.parse(value), "$key = $value 解析不出长度")
+        }
+    }
+}

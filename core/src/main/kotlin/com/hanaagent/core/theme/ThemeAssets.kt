@@ -209,3 +209,38 @@ object CssColor {
     /** `var(--x)`，允许带回退值 `var(--x, #fff)`（回退值本身不解析 —— 上游没用过）。 */
     private val VAR_RE_INLINE = Regex("""var\(\s*(--[a-z0-9-]+)\s*(?:,[^)]*)?\)""", RegexOption.IGNORE_CASE)
 }
+
+/**
+ * 把 CSS 的长度值解析成像素。
+ *
+ * 设计系统里的间距、圆角、字号都是 `rem` 或 `px`。CSS 的 `rem` 相对根字号，
+ * 浏览器默认 16px，上游没有改过根字号，所以这里用 16 作为换算基准。
+ *
+ * Compose 侧拿到 px 之后再转 dp / sp。**不要**在这一层就转成 dp：那是平台概念，
+ * 而这个模块是纯 JVM 的。
+ */
+object CssLength {
+
+    /** 1rem 等于多少 px。上游没有改过根字号，用浏览器默认值。 */
+    const val ROOT_FONT_SIZE_PX = 16.0f
+
+    /**
+     * @return 像素值；不是长度（比如 `calc(...)`、`max(...)`、`none`）时返回 null
+     */
+    fun parse(value: String): Float? {
+        val text = value.trim()
+        // calc() / max() / min() 不展开：上游只在少数几个派生 token 上用，
+        // 需要它们的时候由调用方自己算，比在这里做半个 CSS 引擎可靠
+        if (text.isEmpty() || "(" in text) return null
+
+        return when {
+            text.endsWith("rem") -> text.removeSuffix("rem").trim().toFloatOrNull()
+                ?.times(ROOT_FONT_SIZE_PX)
+
+            text.endsWith("px") -> text.removeSuffix("px").trim().toFloatOrNull()
+
+            // 无单位的 0
+            else -> text.toFloatOrNull()?.takeIf { it == 0f }
+        }
+    }
+}
