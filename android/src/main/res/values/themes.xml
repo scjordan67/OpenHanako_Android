@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose 自己管配色；这里只需要一个不画 ActionBar 的宿主主题。
+         真正的 11 套主题会在 Stage 5 从上游的设计 token 映射过来。 -->
+    <style name="Theme.HanaAgent" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
