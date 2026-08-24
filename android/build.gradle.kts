@@ -1,15 +1,11 @@
 plugins {
+    // 三个插件都在这里带版本号声明，一起装进 :android 自己的 classloader。
+    // AGP 与 Kotlin Android 插件必须同处一个 classloader —— KGP 的
+    // KotlinAndroidTarget 直接引用 AGP 的 com.android.build.gradle.api.BaseVariant，
+    // 分开装载时父加载器看不见子加载器里的 AGP，会报 NoClassDefFoundError。
+    // 根项目为此刻意不声明任何插件，原因见 build.gradle.kts。
     alias(libs.plugins.android.application)
-    // Kotlin Android 插件**不写版本号**。它和 :core 用的 kotlin.jvm 同在
-    // org.jetbrains.kotlin:kotlin-gradle-plugin 这一个 jar 里，而根项目声明
-    // kotlin.jvm 时已经把这个 jar 挂上了 buildscript classpath —— Gradle 只为
-    // 「org.jetbrains.kotlin.jvm」这个 id 记了版本，对同 jar 里的
-    // 「org.jetbrains.kotlin.android」是"在 classpath 上但版本未知"。此时再带
-    // 版本号请求，AlreadyOnClasspathPluginResolver 会因为无法校验兼容性而直接抛错。
-    // 不写版本即可，反正是同一个 jar，版本必然与 kotlin.jvm 一致。
-    id("org.jetbrains.kotlin.android")
-    // Compose 编译器插件是独立 artifact（compose-compiler-gradle-plugin），
-    // 不在上面那个 jar 里，所以照常带版本号解析。
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
 }
 
