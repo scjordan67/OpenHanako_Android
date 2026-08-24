@@ -14,7 +14,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.hanaagent.android.data.AppSettings
+import com.hanaagent.android.data.CrashLog
 import com.hanaagent.android.data.SessionStore
+import com.hanaagent.android.ui.CrashReportScreen
 import com.hanaagent.android.ui.chat.ChatScreen
 import com.hanaagent.android.ui.chat.ChatState
 import com.hanaagent.android.ui.settings.SettingsScreen
@@ -26,7 +28,22 @@ private enum class Screen { CHAT, SETTINGS }
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { HanaApp(AppSettings(applicationContext)) }
+        setContent {
+            val context = androidx.compose.ui.platform.LocalContext.current
+            var crash by remember { mutableStateOf(CrashLog.lastCrash(context)) }
+
+            // 崩溃页在进入应用主体**之前**判断，且不套 HanaTheme ——
+            // 启动路径上的崩溃走不到聊天页，而崩掉的很可能正是主题/资产本身。
+            val trace = crash
+            if (trace != null) {
+                CrashReportScreen(
+                    trace = trace,
+                    onDismiss = { CrashLog.clear(context); crash = null },
+                )
+            } else {
+                HanaApp(AppSettings(applicationContext))
+            }
+        }
     }
 }
 
