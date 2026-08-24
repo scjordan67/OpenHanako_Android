@@ -8,8 +8,11 @@
 # 「默认人格不改动」这条约束是逐字节的，不能只在 Linux 上成立。
 * text=auto eol=lf
 
-# 例外：Windows 批处理必须是 CRLF，cmd.exe 不认 LF 换行的续行
-*.bat text eol=crlf
+# 例外：Windows 批处理必须是 CRLF，cmd.exe 不认 LF 换行的续行。
+# 用 -text 而不是 `text eol=crlf`：gradlew.bat 是 wrapper 生成的，仓库里存的就是
+# CRLF 且本来就对。`text` 会要求把 blob 重新规范化成 LF，白白产生一次整文件重写。
+# -text 的语义正是这个文件需要的 —— 谁都别动它的字节。
+*.bat -text
 
 # 二进制，永不做 EOL 转换
 *.jar  binary
