@@ -1,0 +1,511 @@
+{
+  "note": "由 tools/tokenizer-truth/generate.mjs 从上游 @node-rs/jieba 生成，勿手工编辑",
+  "upstreamSource": "lib/search/session-search-tokenizer.ts",
+  "customWords": [
+    "session_search 1000 nz",
+    "session 1000 eng",
+    "SessionFile 1000 eng",
+    "A2A通信 1000 nz",
+    "聊天记录 1000 nz",
+    "搜不到 1000 v",
+    "Agent 1000 eng",
+    "CodeX 1000 eng",
+    "Claude 1000 eng",
+    "OpenClaw 1000 eng",
+    "Cherry 1000 eng",
+    "Studio 1000 eng",
+    "HANA_HOME 1000 eng",
+    "Bridge 1000 eng",
+    "MCP 1000 eng",
+    "RC 1000 eng",
+    "better-sqlite3 1000 eng"
+  ],
+  "cases": [
+    {
+      "input": "记忆传送带",
+      "terms": [
+        "记忆传送带",
+        "记忆",
+        "传送",
+        "传送带"
+      ]
+    },
+    {
+      "input": "昨天聊到的那个方案",
+      "terms": [
+        "昨天聊到的那个方案",
+        "昨天",
+        "聊到",
+        "那个",
+        "方案"
+      ]
+    },
+    {
+      "input": "帮我看看 session_search 为什么搜不到",
+      "terms": [
+        "帮我看看 session_search 为什么搜不到",
+        "帮我看看",
+        "session_search",
+        "为什么搜不到",
+        "看看",
+        "什么",
+        "为什么",
+        "不到",
+        "搜不到"
+      ]
+    },
+    {
+      "input": "A2A通信",
+      "terms": [
+        "a2a通信",
+        "a2a",
+        "通信"
+      ]
+    },
+    {
+      "input": "聊天记录",
+      "terms": [
+        "聊天记录",
+        "聊天",
+        "记录"
+      ]
+    },
+    {
+      "input": "better-sqlite3 编译失败",
+      "terms": [
+        "better-sqlite3 编译失败",
+        "better-sqlite3",
+        "编译失败",
+        "编译",
+        "失败"
+      ]
+    },
+    {
+      "input": "HANA_HOME 在哪",
+      "terms": [
+        "hana_home 在哪",
+        "hana_home",
+        "在哪",
+        "hana",
+        "home"
+      ]
+    },
+    {
+      "input": "Claude 和 CodeX 的区别",
+      "terms": [
+        "claude 和 codex 的区别",
+        "claude",
+        "codex",
+        "的区别",
+        "区别"
+      ]
+    },
+    {
+      "input": "把 Agent 导出成角色卡",
+      "terms": [
+        "把 agent 导出成角色卡",
+        "agent",
+        "导出成角色卡",
+        "导出",
+        "角色"
+      ]
+    },
+    {
+      "input": "MCP 连接超时",
+      "terms": [
+        "mcp 连接超时",
+        "mcp",
+        "连接超时",
+        "连接",
+        "超时"
+      ]
+    },
+    {
+      "input": "Bridge 发不出图片",
+      "terms": [
+        "bridge 发不出图片",
+        "bridge",
+        "发不出图片",
+        "发不",
+        "不出",
+        "发不出",
+        "图片"
+      ]
+    },
+    {
+      "input": "OpenClaw 技能安装",
+      "terms": [
+        "openclaw 技能安装",
+        "openclaw",
+        "技能安装",
+        "技能",
+        "安装"
+      ]
+    },
+    {
+      "input": "Cherry Studio",
+      "terms": [
+        "cherry studio",
+        "cherry",
+        "studio"
+      ]
+    },
+    {
+      "input": "RC 模式",
+      "terms": [
+        "rc 模式",
+        "rc",
+        "模式"
+      ]
+    },
+    {
+      "input": "SessionFile 的 fileId 是什么",
+      "terms": [
+        "sessionfile 的 fileid 是什么",
+        "sessionfile",
+        "fileid",
+        "是什么",
+        "session",
+        "file",
+        "什么"
+      ]
+    },
+    {
+      "input": "凌晨四点的逻辑日边界",
+      "terms": [
+        "凌晨四点的逻辑日边界",
+        "凌晨",
+        "四点",
+        "逻辑",
+        "边界"
+      ]
+    },
+    {
+      "input": "深色主题下纸质纹理会翻白",
+      "terms": [
+        "深色主题下纸质纹理会翻白",
+        "深色",
+        "主题",
+        "纸质",
+        "纹理",
+        "翻白"
+      ]
+    },
+    {
+      "input": "为什么 compileDaily 必须先于 compileToday",
+      "terms": [
+        "为什么 compiledaily 必须先于 compiletoday",
+        "为什么",
+        "compiledaily",
+        "必须先于",
+        "compiletoday",
+        "什么",
+        "必须",
+        "先于"
+      ]
+    },
+    {
+      "input": "我今天心情不太好",
+      "terms": [
+        "我今天心情不太好",
+        "今天",
+        "心情",
+        "不太好"
+      ]
+    },
+    {
+      "input": "写一篇日记",
+      "terms": [
+        "写一篇日记",
+        "一篇",
+        "日记"
+      ]
+    },
+    {
+      "input": "沙盒把写入限制在工作目录",
+      "terms": [
+        "沙盒把写入限制在工作目录",
+        "沙盒",
+        "写入",
+        "限制",
+        "工作",
+        "目录"
+      ]
+    },
+    {
+      "input": "PathGuard 四级访问控制",
+      "terms": [
+        "pathguard 四级访问控制",
+        "pathguard",
+        "四级访问控制",
+        "四级",
+        "访问",
+        "控制",
+        "访问控制"
+      ]
+    },
+    {
+      "input": "平板上跑不起来",
+      "terms": [
+        "平板上跑不起来",
+        "平板",
+        "起来"
+      ]
+    },
+    {
+      "input": "Kotlin Compose 重写界面",
+      "terms": [
+        "kotlin compose 重写界面",
+        "kotlin",
+        "compose",
+        "重写界面",
+        "重写",
+        "界面"
+      ]
+    },
+    {
+      "input": "web_search 降级到浏览器搜索",
+      "terms": [
+        "web_search 降级到浏览器搜索",
+        "web_search",
+        "降级到浏览器搜索",
+        "web",
+        "search",
+        "降级",
+        "浏览",
+        "浏览器",
+        "搜索"
+      ]
+    },
+    {
+      "input": "google 反爬很凶",
+      "terms": [
+        "google 反爬很凶",
+        "google",
+        "反爬很凶"
+      ]
+    },
+    {
+      "input": "限流表不要自己调",
+      "terms": [
+        "限流表不要自己调",
+        "限流",
+        "不要",
+        "自己"
+      ]
+    },
+    {
+      "input": "多模态模型能直接看图",
+      "terms": [
+        "多模态模型能直接看图",
+        "模态",
+        "模型",
+        "直接"
+      ]
+    },
+    {
+      "input": "Vision Bridge 是给纯文本模型的补丁",
+      "terms": [
+        "vision bridge 是给纯文本模型的补丁",
+        "vision",
+        "bridge",
+        "是给纯文本模型的补丁",
+        "文本",
+        "模型",
+        "补丁"
+      ]
+    },
+    {
+      "input": "FTS5 unicode61 分词",
+      "terms": [
+        "fts5 unicode61 分词",
+        "fts5",
+        "unicode61",
+        "分词"
+      ]
+    },
+    {
+      "input": "  多余   空格   要归一  ",
+      "terms": [
+        "多余 空格 要归一",
+        "多余",
+        "空格",
+        "要归一"
+      ]
+    },
+    {
+      "input": "ＦＵＬＬＷＩＤＴＨ 全角转半角",
+      "terms": [
+        "fullwidth 全角转半角",
+        "fullwidth",
+        "全角转半角",
+        "全角",
+        "半角"
+      ]
+    },
+    {
+      "input": "MixedCase Should Lowercase",
+      "terms": [
+        "mixedcase should lowercase",
+        "mixedcase",
+        "should",
+        "lowercase"
+      ]
+    },
+    {
+      "input": "！？。，、；：",
+      "terms": []
+    },
+    {
+      "input": "",
+      "terms": []
+    },
+    {
+      "input": "a",
+      "terms": [
+        "a"
+      ]
+    },
+    {
+      "input": "的",
+      "terms": []
+    },
+    {
+      "input": "记",
+      "terms": []
+    },
+    {
+      "input": "2026-08-24 的会话",
+      "terms": [
+        "2026-08-24 的会话",
+        "2026-08-24",
+        "的会话",
+        "2026-08",
+        "24"
+      ]
+    },
+    {
+      "input": "v0.450.0 发版摘要",
+      "terms": [
+        "v0.450.0 发版摘要",
+        "v0.450.0",
+        "发版摘要",
+        "v0.450",
+        "0",
+        "发版",
+        "摘要"
+      ]
+    },
+    {
+      "input": "node_modules 太大了",
+      "terms": [
+        "node_modules 太大了",
+        "node_modules",
+        "太大了",
+        "node",
+        "modules",
+        "太大"
+      ]
+    },
+    {
+      "input": "file-history/service.ts:42",
+      "terms": [
+        "file-history/service.ts:42",
+        "file-history",
+        "service.ts",
+        "42",
+        "file",
+        "history",
+        "service",
+        "ts"
+      ]
+    },
+    {
+      "input": "把 today.md 蒸馏成 daily",
+      "terms": [
+        "把 today.md 蒸馏成 daily",
+        "today.md",
+        "蒸馏成",
+        "daily",
+        "today",
+        "md",
+        "蒸馏"
+      ]
+    },
+    {
+      "input": "subagent 可续接实例池",
+      "terms": [
+        "subagent 可续接实例池",
+        "subagent",
+        "可续接实例池",
+        "续接",
+        "实例"
+      ]
+    },
+    {
+      "input": "workflow 的 writeFolders 必须显式声明",
+      "terms": [
+        "workflow 的 writefolders 必须显式声明",
+        "workflow",
+        "writefolders",
+        "必须显式声明",
+        "必须",
+        "显式",
+        "声明"
+      ]
+    },
+    {
+      "input": "心跳巡检和笺扫描",
+      "terms": [
+        "心跳巡检和笺扫描",
+        "心跳",
+        "巡检",
+        "扫描"
+      ]
+    },
+    {
+      "input": "书桌上的笺会被主动执行",
+      "terms": [
+        "书桌上的笺会被主动执行",
+        "书桌",
+        "桌上",
+        "书桌上",
+        "主动",
+        "执行"
+      ]
+    },
+    {
+      "input": "角色卡 zip 白名单",
+      "terms": [
+        "角色卡 zip 白名单",
+        "角色卡",
+        "zip",
+        "白名单",
+        "角色",
+        "名单"
+      ]
+    },
+    {
+      "input": "外貌自述用视觉模型生成",
+      "terms": [
+        "外貌自述用视觉模型生成",
+        "外貌",
+        "自述",
+        "视觉",
+        "模型",
+        "生成"
+      ]
+    },
+    {
+      "input": "WorkManager 补偿式调度",
+      "terms": [
+        "workmanager 补偿式调度",
+        "workmanager",
+        "补偿式调度",
+        "补偿",
+        "调度",
+        "式调度"
+      ]
+    }
+  ]
+}
