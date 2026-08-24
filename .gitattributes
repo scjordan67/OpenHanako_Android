@@ -1,0 +1,21 @@
+# 仓库统一存 LF，并且**任何平台 checkout 也必须拿到 LF**。
+#
+# 这不是排版洁癖。core/src/main/resources/assets/ 下的人格模板与搜索提取脚本
+# 是逐字节锁定的资产（persona-lock.sha256 / search-asset-lock.sha256）：
+# Windows 的 core.autocrlf 默认会在 checkout 时把它们改写成 CRLF，于是
+#   1. sha256 锁当场失效 —— CI 上的 windows 任务就是这么红的；
+#   2. 更要紧的是，真正打进 APK 的字节不再是上游原文。
+# 「默认人格不改动」这条约束是逐字节的，不能只在 Linux 上成立。
+* text=auto eol=lf
+
+# 例外：Windows 批处理必须是 CRLF，cmd.exe 不认 LF 换行的续行
+*.bat text eol=crlf
+
+# 二进制，永不做 EOL 转换
+*.jar  binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.ttf  binary
+*.otf  binary

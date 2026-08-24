@@ -56,6 +56,30 @@ class PersonaAssetsLockTest {
     }
 
     @Test
+    fun `资产里不含 CR —— 换行必须是 LF`() {
+        // 这条本身不比上面那条更严格：sha256 已经把 CRLF 挡掉了。它存在只是为了把
+        // 诊断说清楚。Windows 的 git 默认 core.autocrlf=true，checkout 时会把每份
+        // markdown 改写成 CRLF，于是 26 条资产全部 sha 对不上 —— 报出来是一堆
+        // 「内容已改动（期望 abc…，实际 def…）」，看着像有人真去动了人格文案。
+        // 实际要改的是仓库根的 .gitattributes（`* text=auto eol=lf`）。
+        //
+        // 顺带说明为什么不能"在校验时归一化换行再比"：那样确实能让测试变绿，但打进
+        // APK 的字节仍然不是上游原文。「默认人格不改动」是逐字节的约束。
+        val withCr = PersonaAssets.listAll().filter { path ->
+            val bytes = javaClass.getResourceAsStream("/assets/persona/$path")
+                ?.use { it.readBytes() }
+            assertNotNull(bytes, "资产缺失：$path")
+            bytes.contains('\r'.code.toByte())
+        }
+
+        assertTrue(
+            withCr.isEmpty(),
+            "以下人格资产带了 CR，说明 checkout 时被改写成了 CRLF。" +
+                "去看仓库根的 .gitattributes，别改锁文件：\n" + withCr.joinToString("\n"),
+        )
+    }
+
+    @Test
     fun `锁文件覆盖了全部打包资产，没有漏网的`() {
         val lockedPaths = readLock().map { it.path }.toSortedSet()
         val packagedPaths = PersonaAssets.listAll().toSortedSet()
