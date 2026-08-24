@@ -30,12 +30,16 @@ jobs:
       # 不加 --stacktrace：Kotlin 编译错误只需要那几行 `e:`，而 --stacktrace 会打出
       # 上百行 Gradle 内部调用栈，把真正的错误顶到日志中间，排查时得翻很久。
       - name: 跑 :core 测试
+        # core 这个 job 跑在 ubuntu/macos/windows 上，而 windows runner 的默认 shell
+        # 是 PowerShell —— set -o pipefail 和 /tmp 路径在那边都不成立。显式要 bash。
+        shell: bash
         run: |
           set -o pipefail
           ./gradlew :core:test 2>&1 | tee /tmp/core-build.log
 
       - name: 编译错误摘要
         if: failure()
+        shell: bash
         run: |
           echo "── Kotlin 编译错误 ──"
           grep -E "^e: |^w: .*error" /tmp/core-build.log || echo "(没有 e: 行 —— 多半是测试失败而不是编译失败)"

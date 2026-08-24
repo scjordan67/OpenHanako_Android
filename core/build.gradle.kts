@@ -22,8 +22,15 @@ java {
 
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.ktor.client.core)
+
+    // 下面两个用 api 而不是 implementation —— 它们的类型出现在 :core 的**公开签名**里：
+    //   SessionJsonl.append(file, entry: JsonObject)
+    //   SessionMessages.parseContent(content: JsonElement?)
+    //   ChatTurn(http: HttpClient, …)
+    // 用 implementation 的话它们只在 :core 自己的编译期可见，:android 调这些函数时
+    // 会报 "Cannot access class 'JsonObject'"，而错误指向调用处、不指向这里，很难联想。
+    api(libs.kotlinx.serialization.json)
+    api(libs.ktor.client.core)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.json)
 
