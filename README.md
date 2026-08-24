@@ -28,11 +28,25 @@ docs/      各 spike 的结论与待设备验证清单
 ## 构建
 
 ```bash
-gradle :core:test           # 45 个测试，不需要 Android SDK
-gradle :android:assembleDebug -Pandroid.enabled=true   # 需要 ANDROID_SDK_ROOT
+LANG=C.UTF-8 ./gradlew :core:test        # 165 个测试，不需要 Android SDK
+LANG=C.UTF-8 ./gradlew :android:assembleDebug -Pandroid.enabled=true   # 需要 ANDROID_SDK_ROOT
 ```
 
-## Stage 0 已完成
+**为什么要带 `LANG=C.UTF-8`。** 测试方法名是中文，编译产物里会出现带中文的
+class 文件名。JVM 能否写出这种文件名由 `sun.jnu.encoding` 决定，而它由操作系统
+locale 定死，**不能**用 `-D` 设置。容器里常常没设 `LANG`，此时它退化成
+ANSI_X3.4-1968，编译会报一句与真实原因毫无关系的
+"Failed to create MD5 hash for file ... as it does not exist"。
+`:core` 的构建脚本会实际探一次并直接告诉你怎么做。装了正常 locale 的机器
+（以及 CI 的 runner）不需要这个前缀。
+
+`:android` 默认**不被包含**在构建里，要靠 `-Pandroid.enabled=true` 打开。
+这样没有 Android SDK 的机器（比如挡了 dl.google.com 的开发容器）也能完整
+编译和测试 `:core`。CI 负责验证 `:android` 那一半。
+
+## 进度
+
+**Stage 0：契约与骨架**
 
 | 交付 | 状态 |
 |---|---|
@@ -42,6 +56,22 @@ gradle :android:assembleDebug -Pandroid.enabled=true   # 需要 ANDROID_SDK_ROOT
 | Spike B：中文分词跨设备一致性 | ✅ 召回 91.3%，报告 `build/reports/spike-b-tokenizer.md` |
 | Spike C：逻辑日与补偿式调度 | ✅ |
 | Spike D：搜索 URL / 降级 / 限流 / 提取脚本 | ✅ 见 `docs/spike-d-search.md` |
+
+**Stage 1–4：能对话所需的纯逻辑**
+
+| 交付 | 状态 |
+|---|---|
+| MoodParser（流式内省标签解析，分片不变） | ✅ |
+| 会话 JSONL 存储与分支模型 | ✅ |
+| 模型请求构造与 SSE 流式解析（两家 API 归一） | ✅ |
+| 三层人格合成 | ✅ |
+| system prompt 装配（cache 前缀有序） | ✅ |
+| 记忆传送带零 LLM 的装配部分 | ✅ |
+| 增量 UTF-8 解码（中文正文跨分片） | ✅ |
+| ChatTurn：一次完整对话回合 | ✅ |
+
+**还没做**：记忆传送带里需要 LLM 的几步、FactStore 在设备上的落地、
+Compose 聊天界面与 11 套主题、WorkManager 维护任务、日记与图片输入的界面部分。
 
 ### 几个必须记住的结论
 
