@@ -1,0 +1,9 @@
+name: Smoke
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "workflow 能飞"

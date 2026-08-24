@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # :core 是纯 Kotlin/JVM，不需要 Android SDK —— 这一层在任何装了 JDK 的机器上
+  # 都能跑，包括没有 SDK 的开发容器。跨平台跑一遍是因为记忆传送带涉及时区和
+  # 文件路径，而分词涉及 Unicode 归一，这些在不同 OS 上有翻过车的先例。
+  core:
+    name: core (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: 跑 :core 测试
+        run: ./gradlew :core:test --stacktrace
+
+      - name: 上传 Spike 报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: spike-reports-${{ matrix.os }}
+          path: |
+            core/build/reports/
+            core/build/test-results/
+          if-no-files-found: ignore
+
+  # :android 需要 Android SDK。GitHub 托管的 ubuntu runner 预装了 SDK，
+  # ANDROID_HOME 是现成的 —— 这是目前唯一能编译 Android 侧的地方：
+  # 开发容器的出口策略挡了 dl.google.com，SDK 和 AGP 都拿不到。
+  android:
+    name: android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: 确认 SDK 就位
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls "$ANDROID_HOME/platforms" || true
+
+      - name: 编译 :android
+        run: ./gradlew :android:assembleDebug -Pandroid.enabled=true --stacktrace
+
+      - name: 跑 :android 的单元测试
+        run: ./gradlew :android:testDebugUnitTest -Pandroid.enabled=true --stacktrace
+
+      - name: 上传 APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk
+          path: android/build/outputs/apk/debug/*.apk
+          if-no-files-found: warn
