@@ -6,4 +6,4 @@ jobs:
   smoke:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "workflow 能起来"
+      - run: echo "workflow 能飞"
