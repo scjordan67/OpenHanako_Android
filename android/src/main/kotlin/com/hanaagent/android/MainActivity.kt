@@ -26,7 +26,7 @@ private enum class Screen { CHAT, SETTINGS }
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { HanaApp(applicationContext.let { AppSettings(it) }) }
+        setContent { HanaApp(AppSettings(applicationContext)) }
     }
 }
 
@@ -40,6 +40,7 @@ private fun HanaApp(settings: AppSettings) {
     val state = remember {
         ChatState(settings, SessionStore(context))
     }
+    // restore() 是 suspend 的：读会话文件与投影分支放在 IO 线程，别卡住首帧
     LaunchedEffect(Unit) { state.restore() }
 
     HanaTheme(themeId = themeId) {

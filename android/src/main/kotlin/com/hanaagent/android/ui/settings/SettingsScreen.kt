@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import com.hanaagent.android.data.AppSettings
 import com.hanaagent.android.ui.theme.LocalHanaColors
 import com.hanaagent.core.llm.EndpointConfig
-import com.hanaagent.core.persona.PersonaAssets
 import com.hanaagent.core.persona.YuanVisuals
 import com.hanaagent.core.theme.CssColor
 import com.hanaagent.core.theme.ThemeAssets
@@ -133,8 +132,8 @@ fun SettingsScreen(
             modifier = Modifier.padding(top = colors.space16),
         )
         Row(horizontalArrangement = Arrangement.spacedBy(colors.space8)) {
-            // kong 在上游是占位，没有 identity 与 AGENTS 两层，合成会直接报错
-            for (id in PersonaAssets.BUILT_IN_YUAN.filter { it != "kong" }) {
+            // 可选的源集中定义在 AppSettings —— 过滤规则写两遍迟早会漂移
+            for (id in AppSettings.SELECTABLE_YUAN) {
                 val selected = id == yuan
                 Text(
                     text = YuanVisuals.moodLabel(id),

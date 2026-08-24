@@ -51,9 +51,16 @@ class AppSettings(context: Context) {
             .takeIf { it in ThemeAssets.themeIds } ?: ThemeAssets.defaultTheme
         set(value) = prefs.edit().putString(KEY_THEME, value).apply()
 
+    /**
+     * 当前的源。
+     *
+     * 校验用 [SELECTABLE_YUAN] 而不是 [PersonaAssets.BUILT_IN_YUAN] —— 后者含 kong，
+     * 而 kong 在上游是占位（只有空的 yuan 层，没有 identity 与 AGENTS）。一旦存进去，
+     * PersonaComposer.compose() 会抛 IllegalStateException，表现为**每次发消息都闪退**。
+     */
     var yuan: String
         get() = prefs.getString(KEY_YUAN, PersonaAssets.DEFAULT_YUAN).orEmpty()
-            .takeIf { it in PersonaAssets.BUILT_IN_YUAN } ?: PersonaAssets.DEFAULT_YUAN
+            .takeIf { it in SELECTABLE_YUAN } ?: PersonaAssets.DEFAULT_YUAN
         set(value) = prefs.edit().putString(KEY_YUAN, value).apply()
 
     var userName: String
@@ -67,7 +74,10 @@ class AppSettings(context: Context) {
     fun endpoint(): EndpointConfig.Resolved? =
         if (missingPiece() != null) null else EndpointConfig.resolve(baseUrlInput, apiOverride)
 
-    private companion object {
+    companion object {
+        /** 真正能用来合成人格的源 —— BUILT_IN_YUAN 去掉占位的 kong。 */
+        val SELECTABLE_YUAN: List<String> = PersonaAssets.BUILT_IN_YUAN.filter { it != "kong" }
+
         const val KEY_API_KEY = "apiKey"
         const val KEY_BASE_URL = "baseUrl"
         const val KEY_MODEL = "model"

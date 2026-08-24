@@ -21,12 +21,29 @@ class SessionStore(context: Context, sessionId: String = DEFAULT_SESSION) {
 
     private val file: File = File(File(context.filesDir, "sessions"), "$sessionId.jsonl")
 
-    /** 当前分支上的消息，按顺序。文件不存在时是空的。 */
-    fun load(): List<SessionJsonl.Message> {
-        val entries = SessionJsonl.readFile(file)
-        if (entries.isEmpty()) return emptyList()
-        return SessionJsonl.projectCurrentBranch(entries).messages
+    /**
+     * 读取结果。
+     *
+     * 刻意不让 [load] 直接抛：会话文件损坏时（非法 JSON、id 重复、谱系成环），
+     * [SessionJsonl.projectCurrentBranch] 会抛 [SessionJsonl.BranchError]，而这个调用
+     * 在应用启动路径上 —— 抛出去就是**开机即崩，而且每次都崩**，用户再也进不去，
+     * 连带那份还在磁盘上的对话也拿不回来。
+     */
+    sealed interface LoadResult {
+        data class Ok(val messages: List<SessionJsonl.Message>) : LoadResult
+
+        /** 文件在，但读不成一条完整的分支。文件**没有被动过**。 */
+        data class Broken(val reason: String) : LoadResult
     }
+
+    /** 当前分支上的消息，按顺序。文件不存在时是空的。 */
+    fun load(): LoadResult = runCatching {
+        val entries = SessionJsonl.readFile(file)
+        if (entries.isEmpty()) emptyList() else SessionJsonl.projectCurrentBranch(entries).messages
+    }.fold(
+        onSuccess = { LoadResult.Ok(it) },
+        onFailure = { LoadResult.Broken(it.message ?: it::class.simpleName ?: "未知原因") },
+    )
 
     /** 当前分支最后一条的 id —— 新消息以它为父。 */
     private fun currentLeafId(): String? {
@@ -72,7 +89,22 @@ class SessionStore(context: Context, sessionId: String = DEFAULT_SESSION) {
     }
 
     /** 把当前分支翻成模型消息。内省块原样带回，见 [SessionMessages]。 */
-    fun history(): List<ChatPayload.ChatMessage> = SessionMessages.toChatMessages(load())
+    fun history(): List<ChatPayload.ChatMessage> =
+        SessionMessages.toChatMessages((load() as? LoadResult.Ok)?.messages.orEmpty())
+
+    /**
+     * 把读不动的会话文件挪开，让应用能继续用。
+     *
+     * **改名而不是删除。** 这里面是用户和 Agent 的全部对话，就算当前读不出来，
+     * 也可能只是最后一行写坏了 —— 手工救回来完全有可能。删掉就真没了。
+     *
+     * @return 挪去哪儿了，供界面告诉用户
+     */
+    fun setAsideBroken(): String? {
+        if (!file.exists()) return null
+        val target = File(file.parentFile, "${file.nameWithoutExtension}.broken-${System.currentTimeMillis()}.jsonl")
+        return if (file.renameTo(target)) target.name else null
+    }
 
     fun clear() {
         file.delete()

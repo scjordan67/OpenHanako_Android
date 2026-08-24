@@ -65,6 +65,29 @@ fun ChatScreen(
             }
         }
 
+        // 会话文件读不动：明确说出来，并给一条出路。不自动删 —— 里面是全部对话，
+        // 就算现在读不出来也可能只是最后一行写坏了，手工救回来完全有可能。
+        state.brokenSession?.let { reason ->
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = colors.space16, vertical = colors.space8),
+            ) {
+                Text(
+                    text = "之前的会话读不动了：$reason",
+                    color = colors.danger,
+                    fontSize = colors.fsUi,
+                )
+                TextButton(onClick = { scope.launch { state.setAsideBrokenSession() } }) {
+                    Text(
+                        "挪开它，重新开始（文件保留，不删）",
+                        color = colors.accent,
+                        fontSize = colors.fsUi,
+                    )
+                }
+            }
+        }
+
         state.blocker?.let { blocker ->
             Text(
                 text = "$blocker —— 点右上角「设置」补上",
